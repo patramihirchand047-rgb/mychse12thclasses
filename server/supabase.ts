@@ -87,6 +87,27 @@ END $$;
 export const PURGED_DEMO_REG_IDS = new Set(['MYCHSE-2026-00001', 'MYCHSE-2026-00002', 'MYCHSE-2026-00003']);
 export const PURGED_DEMO_EMAILS = new Set(['aarav.mohapatra@gmail.com', 'priyanka.das.chse@gmail.com', 'rohan.tripathy2026@gmail.com']);
 
+// Ensure WebSocket constructor exists in serverless environments (like Netlify functions on Node < 22)
+// to prevent @supabase/realtime-js from throwing "Node.js detected but native WebSocket not found"
+if (typeof globalThis.WebSocket === 'undefined') {
+  try {
+    // Provide a minimal WebSocket stub for environments without realtime requirement
+    (globalThis as any).WebSocket = class ServerlessWebSocketStub {
+      static readonly CONNECTING = 0;
+      static readonly OPEN = 1;
+      static readonly CLOSING = 2;
+      static readonly CLOSED = 3;
+      readyState = 3;
+      send() {}
+      close() {}
+      addEventListener() {}
+      removeEventListener() {}
+    };
+  } catch {
+    // Non-blocking fallback
+  }
+}
+
 let clientInstance: SupabaseClient | null = null;
 
 export function getSupabase(): SupabaseClient {
