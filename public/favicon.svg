@@ -1,0 +1,23 @@
+<svg width="64" height="64" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FDE047" />
+      <stop offset="50%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#D97706" />
+    </linearGradient>
+    <linearGradient id="navyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#0F172A" />
+      <stop offset="100%" stopColor="#1E3A8A" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="url(#goldGrad)" />
+  <circle cx="100" cy="100" r="86" fill="#0B132B" />
+  <circle cx="100" cy="100" r="76" fill="url(#navyGrad)" />
+  <!-- Cap -->
+  <polygon points="100,60 142,74 100,88 58,74" fill="#0F172A" stroke="#FDE047" stroke-width="3" />
+  <circle cx="100" cy="74" r="3" fill="#FDE047" />
+  <!-- Book -->
+  <path d="M 100,108 C 86,104 70,110 60,112 L 60,128 C 70,126 86,120 100,130 C 114,120 130,126 140,128 L 140,112 C 130,110 114,104 100,108 Z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2" />
+  <!-- Ribbon -->
+  <path d="M 36,150 C 76,144 124,144 164,150 L 162,170 C 124,164 76,164 38,170 Z" fill="#1E293B" stroke="#F59E0B" stroke-width="2" />
+</svg>

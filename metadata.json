@@ -1,0 +1,8 @@
+{
+  "name": "Remix MY CHSE 12TH CLASSES",
+  "description": "Official student registration and admission status portal for MY CHSE 12TH CLASSES (+2 Arts, Science, Commerce).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

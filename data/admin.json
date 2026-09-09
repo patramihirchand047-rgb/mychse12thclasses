@@ -1,0 +1,22 @@
+[
+  {
+    "id": "admin_patramihirchand66",
+    "email": "patramihirchand66@gmail.com",
+    "name": "Mihirchand Patra",
+    "role": "Office Administrator",
+    "salt": "2503fa7b06cafdc12e4c87e22a4b89d7",
+    "password_hash": "3918e3386a088ed45752cdb999919b677d0db9e1144a7adfdef260c6255846eebcb2d992fb6d718d4da0a5510feb88ed5b9d3130de4bea9dd1007ea897d0fbe9",
+    "created_at": "2026-09-08T13:05:48.873Z",
+    "last_login": "2026-09-08T18:51:47.375Z"
+  },
+  {
+    "id": "admin_2b17d884-1103-47a6-827c-a93d2095a730",
+    "email": "admin@mychse12thclasses.edu.in",
+    "name": "Super Administrator",
+    "role": "Super Administrator",
+    "salt": "fb8abb85424de821e0677add7c2ce3b3",
+    "password_hash": "9519c865158f3978a5450ba063c03161fc0ac3527c1bf7cb1e4281087bb49eb6e4638dcd90ce0d5d98b61845961d6803ac69b708d0a8dbe3905ed1af64a6eb17",
+    "created_at": "2026-09-08T08:43:36.040Z",
+    "last_login": "2026-09-08T09:16:31.953Z"
+  }
+]

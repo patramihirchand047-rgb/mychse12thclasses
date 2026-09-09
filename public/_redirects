@@ -1,0 +1,3 @@
+# Netlify Redirects for MY CHSE 12TH CLASSES
+/api/*  /.netlify/functions/api/:splat  200!
+/*      /index.html                     200

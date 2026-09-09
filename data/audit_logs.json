@@ -1,0 +1,179 @@
+[
+  {
+    "id": "log_64cf5434-daa5-4393-a123-f6f61232f06f",
+    "timestamp": "2026-09-08T18:51:47.383Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_6b4ef0be-9d98-460f-bbcb-0addbe24f8eb",
+    "timestamp": "2026-09-08T17:01:10.696Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "DELETE_STUDENT",
+    "registration_id": "MYCHSE-2026-00004",
+    "details": "Permanently deleted student Siddharth Mohanty (MYCHSE-2026-00004)"
+  },
+  {
+    "id": "log_8da2df54-c23d-4c0a-8a69-ec1f65299ab6",
+    "timestamp": "2026-09-08T17:00:50.984Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "APPROVE_STUDENT",
+    "registration_id": "MYCHSE-2026-00004",
+    "details": "Changed status for Siddharth Mohanty (MYCHSE-2026-00004) from Pending to Approval"
+  },
+  {
+    "id": "log_208e63cf-ef2a-4103-bde6-03f647dd2dfd",
+    "timestamp": "2026-09-08T17:00:46.949Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_c1f50dc4-a719-4ec0-96a6-35d99da47716",
+    "timestamp": "2026-09-08T16:38:42.402Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGOUT",
+    "details": "Administrator logged out of Admin Panel"
+  },
+  {
+    "id": "log_0c13c702-8165-41b1-8913-817f50877ef8",
+    "timestamp": "2026-09-08T16:38:10.470Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_44db4a59-e1a9-4941-a69d-4e0e347b4afd",
+    "timestamp": "2026-09-08T16:32:25.361Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "DELETE_STUDENT",
+    "registration_id": "MYCHSE-2026-00004",
+    "details": "Permanently deleted student Debashish Sahoo (MYCHSE-2026-00004)"
+  },
+  {
+    "id": "log_f0316390-cd8d-4422-a5b6-44222a4a3589",
+    "timestamp": "2026-09-08T16:32:22.844Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "DELETE_STUDENT",
+    "registration_id": "MYCHSE-2026-00005",
+    "details": "Permanently deleted student Priyanka Sahoo (MYCHSE-2026-00005)"
+  },
+  {
+    "id": "log_e21e33b3-4359-453a-9e3d-3cb0e841923f",
+    "timestamp": "2026-09-08T16:32:20.705Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "DELETE_STUDENT",
+    "registration_id": "MYCHSE-2026-00001",
+    "details": "Permanently deleted student Mihirchand Verification Test (MYCHSE-2026-00001)"
+  },
+  {
+    "id": "log_37bfe5c3-3947-4a12-978a-80042e5b154f",
+    "timestamp": "2026-09-08T16:32:18.425Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "DELETE_STUDENT",
+    "registration_id": "MYCHSE-2026-00006",
+    "details": "Permanently deleted student Siddharth Mohanty (MYCHSE-2026-00006)"
+  },
+  {
+    "id": "log_cb99d65f-ff95-4837-a55e-1cf263b438c4",
+    "timestamp": "2026-09-08T16:32:04.147Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_09e850d8-ba7c-43ef-b5a8-cfef2f179b64",
+    "timestamp": "2026-09-08T16:24:51.364Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_728557a7-d1c1-4e13-9d0d-598d075d488b",
+    "timestamp": "2026-09-08T16:01:19.245Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_6d0f16c0-f075-4037-9319-c28700633ac7",
+    "timestamp": "2026-09-08T15:55:12.350Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGOUT",
+    "details": "Administrator logged out of Admin Panel"
+  },
+  {
+    "id": "log_b0f652df-ecf8-42a6-9150-ce0d477c22c1",
+    "timestamp": "2026-09-08T15:55:00.132Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_ff79bf48-e4df-4d3a-b049-bdaea1502da8",
+    "timestamp": "2026-09-08T15:54:41.075Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGOUT",
+    "details": "Administrator logged out of Admin Panel"
+  },
+  {
+    "id": "log_9f60f4c0-f442-4c82-98ae-c4e6ee2c43cf",
+    "timestamp": "2026-09-08T15:54:28.199Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "DELETE_STUDENT",
+    "registration_id": "MYCHSE-2026-00004",
+    "details": "Permanently deleted student Debashish Sahoo (MYCHSE-2026-00004)"
+  },
+  {
+    "id": "log_be7ca97b-dd4e-4392-999b-0419a5401669",
+    "timestamp": "2026-09-08T15:54:12.274Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "DELETE_STUDENT",
+    "registration_id": "MYCHSE-2026-00005",
+    "details": "Permanently deleted student Priyanka Sahoo (MYCHSE-2026-00005)"
+  },
+  {
+    "id": "log_efb1be9f-8c15-4e72-ab57-e4e550e10040",
+    "timestamp": "2026-09-08T15:54:04.312Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "REJECT_STUDENT",
+    "registration_id": "MYCHSE-2026-00005",
+    "details": "Changed status for Priyanka Sahoo (MYCHSE-2026-00005) from Pending to Rejected"
+  },
+  {
+    "id": "log_1d87aa55-f2bf-4510-848c-854172ae990c",
+    "timestamp": "2026-09-08T15:53:50.345Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_7f849073-f9ee-46dd-acf1-f23b1720a4d9",
+    "timestamp": "2026-09-08T13:07:00.776Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_358de2e3-5218-4139-88f2-f6924cbe58a5",
+    "timestamp": "2026-09-08T13:05:48.896Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
+    "id": "log_fe0dec61-d193-420a-88b9-90fddea83d1a",
+    "timestamp": "2026-09-08T09:16:31.954Z",
+    "admin_email": "admin@mychse12thclasses.edu.in",
+    "action": "ADMIN_LOGIN",
+    "details": "Administrator logged into Admin Panel"
+  },
+  {
+    "id": "log_269ca8f5-7e99-4fbe-ae9e-29b75febded1",
+    "timestamp": "2026-09-08T08:43:36.048Z",
+    "admin_email": "admin@mychse12thclasses.edu.in",
+    "action": "ADMIN_LOGIN",
+    "details": "Administrator logged into Admin Panel"
+  }
+]
