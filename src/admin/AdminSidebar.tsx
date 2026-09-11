@@ -34,7 +34,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onCloseMobile
 }) => {
   const navItemClass = (page: AdminPageView) => {
-    const isActive = currentPage === page;
+    const isActive = currentPage === page || (page === 'admitted' && currentPage === 'approval');
     return `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
       isActive
         ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40 font-bold'

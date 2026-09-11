@@ -75,7 +75,11 @@ function initDb(): void {
   }
 }
 
-export function getAllStudents(): StudentRecord[] {
+let inMemoryStudents: StudentRecord[] | null = null;
+let lastSupabaseFetchTime = 0;
+const SUPABASE_CACHE_TTL_MS = 2000; // 2 seconds fresh cache
+
+function getAllStudentsFromDisk(): StudentRecord[] {
   initDb();
   try {
     const dbFile = path.join(getDataDir(), 'students.json');
@@ -89,7 +93,19 @@ export function getAllStudents(): StudentRecord[] {
   }
 }
 
+export function getAllStudents(): StudentRecord[] {
+  if (inMemoryStudents !== null && inMemoryStudents.length > 0) {
+    return inMemoryStudents;
+  }
+  const fromDisk = getAllStudentsFromDisk();
+  if (fromDisk.length > 0) {
+    inMemoryStudents = fromDisk;
+  }
+  return inMemoryStudents || [];
+}
+
 export function saveStudents(students: StudentRecord[]): void {
+  inMemoryStudents = [...students];
   try {
     initDb();
     const dbFile = path.join(getDataDir(), 'students.json');
@@ -101,10 +117,55 @@ export function saveStudents(students: StudentRecord[]): void {
   }
 }
 
+export async function getFreshStudents(): Promise<StudentRecord[]> {
+  const now = Date.now();
+  if (inMemoryStudents === null || inMemoryStudents.length === 0 || now - lastSupabaseFetchTime > SUPABASE_CACHE_TTL_MS) {
+    try {
+      const sbStudents = await fetchAllStudentsFromSupabase();
+      if (sbStudents && sbStudents.length > 0) {
+        const currentLocal = getAllStudents();
+        const sbMap = new Map(sbStudents.map((s) => [s.registration_id.toUpperCase(), s]));
+        const merged: StudentRecord[] = sbStudents.map((s) => ({ ...s, synced_to_supabase: true }));
+        for (const loc of currentLocal) {
+          if (!sbMap.has(loc.registration_id.toUpperCase()) && !loc.synced_to_supabase) {
+            merged.push(loc);
+          }
+        }
+        inMemoryStudents = merged;
+        lastSupabaseFetchTime = now;
+        saveStudents(inMemoryStudents);
+        return inMemoryStudents;
+      }
+    } catch (e) {
+      console.warn('Supabase fetch notice:', e);
+    }
+  }
+
+  return getAllStudents();
+}
+
 export function findStudentByGmail(gmail: string): StudentRecord | undefined {
   const normalized = gmail.trim().toLowerCase();
   const students = getAllStudents();
   return students.find((s) => s.gmail.trim().toLowerCase() === normalized);
+}
+
+export async function findStudentByGmailAsync(gmail: string): Promise<StudentRecord | undefined> {
+  const normalized = gmail.trim().toLowerCase();
+  const students = await getFreshStudents();
+  const found = students.find((s) => s.gmail.trim().toLowerCase() === normalized);
+  if (found) return found;
+
+  const sbStudent = await findStudentInSupabaseByGmail(gmail);
+  if (sbStudent) {
+    if (!inMemoryStudents) inMemoryStudents = [];
+    if (!inMemoryStudents.some((s) => s.gmail.toLowerCase() === normalized)) {
+      inMemoryStudents.push({ ...sbStudent, synced_to_supabase: true });
+      saveStudents(inMemoryStudents);
+    }
+    return sbStudent;
+  }
+  return undefined;
 }
 
 export function findStudentByRegistrationId(regId: string): StudentRecord | undefined {
@@ -202,19 +263,20 @@ export async function createStudentWithSupabase(
 }
 
 export async function findStudentByRegistrationIdAsync(regId: string): Promise<StudentRecord | undefined> {
-  const localStudent = findStudentByRegistrationId(regId);
+  const normalized = regId.trim().toUpperCase();
+  const students = await getFreshStudents();
+  const localStudent = students.find((s) => s.registration_id.trim().toUpperCase() === normalized);
   if (localStudent) {
     return localStudent;
   }
 
-  // If not found in local, check Supabase
+  // If not found in memory, check Supabase directly
   const supabaseStudent = await findStudentInSupabaseByRegistrationId(regId);
   if (supabaseStudent) {
-    // Cache to local
-    const students = getAllStudents();
-    if (!students.some((s) => s.registration_id === supabaseStudent.registration_id)) {
-      students.push({ ...supabaseStudent, synced_to_supabase: true });
-      saveStudents(students);
+    if (!inMemoryStudents) inMemoryStudents = [];
+    if (!inMemoryStudents.some((s) => s.registration_id.toUpperCase() === normalized)) {
+      inMemoryStudents.push({ ...supabaseStudent, synced_to_supabase: true });
+      saveStudents(inMemoryStudents);
     }
     return supabaseStudent;
   }
@@ -248,25 +310,53 @@ export async function syncAllStudentsToSupabase(): Promise<{ total: number; sync
 export async function syncFromSupabaseToLocal(): Promise<number> {
   try {
     const supabaseStudents = await fetchAllStudentsFromSupabase();
-    if (!supabaseStudents || supabaseStudents.length === 0) {
+    if (!supabaseStudents) {
       return 0;
     }
     const localStudents = getAllStudents();
     const localMap = new Map(localStudents.map((s) => [s.registration_id.toUpperCase(), s]));
-    let addedOrUpdated = 0;
+    const supabaseMap = new Map(supabaseStudents.map((s) => [s.registration_id.toUpperCase(), s]));
+    const updatedList: StudentRecord[] = [];
+    let changed = false;
 
+    // 1. Process all students from Supabase (source of truth)
     for (const sb of supabaseStudents) {
       const existing = localMap.get(sb.registration_id.toUpperCase());
       if (!existing) {
-        localStudents.push({ ...sb, synced_to_supabase: true });
-        addedOrUpdated++;
+        updatedList.push({ ...sb, synced_to_supabase: true });
+        changed = true;
+      } else {
+        const merged: StudentRecord = {
+          ...existing,
+          ...sb,
+          admission_status: sb.admission_status,
+          admission_date: sb.admission_date,
+          updated_at: sb.updated_at || existing.updated_at,
+          synced_to_supabase: true
+        };
+        if (
+          existing.admission_status !== sb.admission_status ||
+          existing.admission_date !== sb.admission_date ||
+          existing.full_name !== sb.full_name
+        ) {
+          changed = true;
+        }
+        updatedList.push(merged);
       }
     }
 
-    if (addedOrUpdated > 0) {
-      saveStudents(localStudents);
+    // 2. Keep any locally created student that hasn't yet reached Supabase
+    for (const local of localStudents) {
+      if (!supabaseMap.has(local.registration_id.toUpperCase()) && !local.synced_to_supabase) {
+        updatedList.push(local);
+        changed = true;
+      }
     }
-    return addedOrUpdated;
+
+    if (changed || updatedList.length !== localStudents.length) {
+      saveStudents(updatedList);
+    }
+    return updatedList.length;
   } catch (err) {
     console.warn('Error syncing from Supabase to local:', err);
     return 0;
@@ -282,12 +372,19 @@ export async function updateStudentAdmissionStatus(
   newStatus: 'Pending' | 'Approval' | 'Admitted' | 'Rejected',
   adminEmail: string
 ): Promise<StudentRecord> {
+  await syncFromSupabaseToLocal();
   const students = getAllStudents();
   const normalized = registrationId.trim().toUpperCase();
-  const index = students.findIndex((s) => s.registration_id.trim().toUpperCase() === normalized);
+  let index = students.findIndex((s) => s.registration_id.trim().toUpperCase() === normalized);
 
   if (index === -1) {
-    throw new Error(`Student with Registration ID ${registrationId} not found.`);
+    const sbStudent = await findStudentInSupabaseByRegistrationId(registrationId);
+    if (sbStudent) {
+      students.push({ ...sbStudent, synced_to_supabase: true });
+      index = students.length - 1;
+    } else {
+      throw new Error(`Student with Registration ID ${registrationId} not found.`);
+    }
   }
 
   const student = students[index];
@@ -325,6 +422,7 @@ export async function updateStudentDetails(
   data: Partial<StudentRecord>,
   adminEmail: string
 ): Promise<StudentRecord> {
+  await syncFromSupabaseToLocal();
   const students = getAllStudents();
   const normalized = registrationId.trim().toUpperCase();
   const index = students.findIndex((s) => s.registration_id.trim().toUpperCase() === normalized);
@@ -376,6 +474,7 @@ export async function updateStudentDetails(
 }
 
 export async function deleteStudent(registrationId: string, adminEmail: string): Promise<boolean> {
+  await syncFromSupabaseToLocal();
   const students = getAllStudents();
   const normalized = registrationId.trim().toUpperCase();
   const index = students.findIndex((s) => s.registration_id.trim().toUpperCase() === normalized);
@@ -404,6 +503,7 @@ export async function bulkUpdateAdmissionStatus(
   newStatus: 'Pending' | 'Approval' | 'Admitted' | 'Rejected',
   adminEmail: string
 ): Promise<{ updatedCount: number; updatedIds: string[] }> {
+  await syncFromSupabaseToLocal();
   const students = getAllStudents();
   const normalizedIds = new Set(registrationIds.map((id) => id.trim().toUpperCase()));
   const now = new Date().toISOString();
@@ -439,6 +539,7 @@ export async function bulkDeleteStudents(
   registrationIds: string[],
   adminEmail: string
 ): Promise<{ deletedCount: number; deletedIds: string[] }> {
+  await syncFromSupabaseToLocal();
   let students = getAllStudents();
   const normalizedIds = new Set(registrationIds.map((id) => id.trim().toUpperCase()));
   const toDelete = students.filter((s) => normalizedIds.has(s.registration_id.trim().toUpperCase()));
@@ -460,7 +561,7 @@ export async function bulkDeleteStudents(
   return { deletedCount: deletedIds.length, deletedIds };
 }
 
-export function getAdminStatistics(): {
+export function getAdminStatistics(providedStudents?: StudentRecord[]): {
   total: number;
   pending: number;
   approval: number;
@@ -473,7 +574,7 @@ export function getAdminStatistics(): {
   };
   recentRegistrations: StudentRecord[];
 } {
-  const students = getAllStudents();
+  const students = providedStudents || getAllStudents();
 
   let pending = 0;
   let approval = 0;
@@ -525,7 +626,10 @@ export interface StudentQueryOptions {
   limit?: number;
 }
 
-export function getAdminStudentsList(options: StudentQueryOptions = {}): {
+export function getAdminStudentsList(
+  options: StudentQueryOptions = {},
+  providedStudents?: StudentRecord[]
+): {
   students: StudentRecord[];
   totalCount: number;
   page: number;
@@ -535,7 +639,7 @@ export function getAdminStudentsList(options: StudentQueryOptions = {}): {
   availableDistricts: string[];
   availableBlocks: string[];
 } {
-  let list = getAllStudents();
+  let list = [...(providedStudents || getAllStudents())];
 
   // Extract all available location values from existing data
   const availableStates = Array.from(new Set(list.map((s) => s.state).filter(Boolean))).sort();

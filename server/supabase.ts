@@ -83,11 +83,7 @@ BEGIN
 END $$;
 `;
 
-// Purged demo IDs to prevent lingering sample records from resurfacing
-export const PURGED_DEMO_REG_IDS = new Set(['MYCHSE-2026-00001', 'MYCHSE-2026-00002', 'MYCHSE-2026-00003']);
-export const PURGED_DEMO_EMAILS = new Set(['aarav.mohapatra@gmail.com', 'priyanka.das.chse@gmail.com', 'rohan.tripathy2026@gmail.com']);
-
-// Ensure WebSocket constructor exists in serverless environments (like Netlify functions on Node < 22)
+// WebSocket stub for serverless environments (like Netlify functions on Node < 22)
 // to prevent @supabase/realtime-js from throwing "Node.js detected but native WebSocket not found"
 if (typeof globalThis.WebSocket === 'undefined') {
   try {
@@ -231,9 +227,6 @@ export async function insertStudentToSupabase(student: StudentRecord): Promise<{
 
 export async function findStudentInSupabaseByRegistrationId(regId: string): Promise<StudentRecord | null> {
   const normalized = regId.trim().toUpperCase();
-  if (PURGED_DEMO_REG_IDS.has(normalized)) {
-    return null;
-  }
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase
@@ -243,7 +236,7 @@ export async function findStudentInSupabaseByRegistrationId(regId: string): Prom
       .limit(1)
       .maybeSingle();
 
-    if (error || !data || PURGED_DEMO_REG_IDS.has(data.registration_id?.toUpperCase())) {
+    if (error || !data || data.id?.startsWith('std_seed_')) {
       return null;
     }
 
@@ -255,9 +248,6 @@ export async function findStudentInSupabaseByRegistrationId(regId: string): Prom
 
 export async function findStudentInSupabaseByGmail(gmail: string): Promise<StudentRecord | null> {
   const normalized = gmail.trim().toLowerCase();
-  if (PURGED_DEMO_EMAILS.has(normalized)) {
-    return null;
-  }
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase
@@ -267,7 +257,7 @@ export async function findStudentInSupabaseByGmail(gmail: string): Promise<Stude
       .limit(1)
       .maybeSingle();
 
-    if (error || !data || PURGED_DEMO_EMAILS.has(data.gmail?.toLowerCase())) {
+    if (error || !data || data.id?.startsWith('std_seed_')) {
       return null;
     }
 
@@ -347,9 +337,7 @@ export async function fetchAllStudentsFromSupabase(): Promise<StudentRecord[]> {
       return [];
     }
 
-    return (data as StudentRecord[]).filter(
-      (s) => !PURGED_DEMO_REG_IDS.has(s.registration_id?.toUpperCase()) && !PURGED_DEMO_EMAILS.has(s.gmail?.toLowerCase())
-    );
+    return (data as StudentRecord[]).filter((s) => !s.id?.startsWith('std_seed_'));
   } catch {
     return [];
   }

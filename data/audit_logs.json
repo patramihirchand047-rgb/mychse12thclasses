@@ -1,5 +1,12 @@
 [
   {
+    "id": "log_76ddcb88-8b51-417f-b44b-0376a1898454",
+    "timestamp": "2026-09-11T13:40:57.804Z",
+    "admin_email": "patramihirchand66@gmail.com",
+    "action": "ADMIN_LOGIN",
+    "details": "Office user logged into Admin Portal: Mihirchand Patra (patramihirchand66@gmail.com)"
+  },
+  {
     "id": "log_64cf5434-daa5-4393-a123-f6f61232f06f",
     "timestamp": "2026-09-08T18:51:47.383Z",
     "admin_email": "patramihirchand66@gmail.com",

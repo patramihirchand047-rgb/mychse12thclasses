@@ -457,7 +457,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             />
           )}
 
-          {currentPage === 'admitted' && (
+          {(currentPage === 'admitted' || currentPage === 'approval') && (
             <AdminStudentsTable
               viewType="admitted"
               onViewStudent={setViewingStudent}

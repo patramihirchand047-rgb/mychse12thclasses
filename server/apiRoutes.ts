@@ -5,8 +5,11 @@ import {
   createStudentWithSupabase,
   findStudentByRegistrationIdAsync,
   findStudentByGmail,
+  findStudentByGmailAsync,
   syncAllStudentsToSupabase,
+  syncFromSupabaseToLocal,
   getAllStudents,
+  getFreshStudents,
   updateStudentAdmissionStatus,
   updateStudentDetails,
   deleteStudent,
@@ -372,9 +375,10 @@ apiRouter.post('/admin/change-password', requireAdminAuth, (req, res) => {
 });
 
 // Admin Dashboard Statistics
-apiRouter.get('/admin/stats', requireAdminAuth, (req, res) => {
+apiRouter.get('/admin/stats', requireAdminAuth, async (req, res) => {
   try {
-    const stats = getAdminStatistics();
+    const students = await getFreshStudents();
+    const stats = getAdminStatistics(students);
     res.json(stats);
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Failed to fetch statistics.' });
@@ -382,21 +386,25 @@ apiRouter.get('/admin/stats', requireAdminAuth, (req, res) => {
 });
 
 // Admin Students Query List (Pagination, Search, Filters, Sorting)
-apiRouter.get('/admin/students', requireAdminAuth, (req, res) => {
+apiRouter.get('/admin/students', requireAdminAuth, async (req, res) => {
   try {
+    const students = await getFreshStudents();
     const { search, stream, status, state, district, block, sortBy, sortOrder, page, limit } = req.query;
-    const result = getAdminStudentsList({
-      search: search as string,
-      stream: stream as string,
-      status: status as string,
-      state: state as string,
-      district: district as string,
-      block: block as string,
-      sortBy: sortBy as any,
-      sortOrder: sortOrder as any,
-      page: page ? Number(page) : 1,
-      limit: limit ? Number(limit) : 25
-    });
+    const result = getAdminStudentsList(
+      {
+        search: search as string,
+        stream: stream as string,
+        status: status as string,
+        state: state as string,
+        district: district as string,
+        block: block as string,
+        sortBy: sortBy as any,
+        sortOrder: sortOrder as any,
+        page: page ? Number(page) : 1,
+        limit: limit ? Number(limit) : 25
+      },
+      students
+    );
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Failed to fetch students list.' });
@@ -404,14 +412,19 @@ apiRouter.get('/admin/students', requireAdminAuth, (req, res) => {
 });
 
 // Admin Single Student Details
-apiRouter.get('/admin/students/:registrationId', requireAdminAuth, (req, res) => {
-  const student = getAllStudents().find(
-    (s) => s.registration_id.trim().toUpperCase() === req.params.registrationId.trim().toUpperCase()
-  );
-  if (!student) {
-    return res.status(404).json({ error: 'Student not found.' });
+apiRouter.get('/admin/students/:registrationId', requireAdminAuth, async (req, res) => {
+  try {
+    const students = await getFreshStudents();
+    const student = students.find(
+      (s) => s.registration_id.trim().toUpperCase() === req.params.registrationId.trim().toUpperCase()
+    );
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found.' });
+    }
+    res.json(student);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || 'Failed to fetch student details.' });
   }
-  res.json(student);
 });
 
 // Admin Admission Status Change (Approval, Admit, Reject, Reset to Pending)
@@ -515,13 +528,22 @@ apiRouter.post('/admin/students/bulk-delete', requireAdminAuth, async (req, res)
 });
 
 // Admin Data Export (CSV and JSON)
-apiRouter.get('/admin/export', requireAdminAuth, (req, res) => {
+apiRouter.get('/admin/export', requireAdminAuth, async (req, res) => {
   try {
     const { status, stream, state, district, block, format } = req.query;
-    let students = getAllStudents();
+    let students = await getFreshStudents();
 
     if (status && status !== 'All') {
-      students = students.filter((s) => s.admission_status.toLowerCase() === (status as string).toLowerCase());
+      const filterStatus = (status as string).toLowerCase();
+      if (filterStatus === 'approval' || filterStatus === 'admitted') {
+        students = students.filter(
+          (s) =>
+            s.admission_status.toLowerCase() === 'approval' ||
+            s.admission_status.toLowerCase() === 'admitted'
+        );
+      } else {
+        students = students.filter((s) => s.admission_status.toLowerCase() === filterStatus);
+      }
     }
     if (stream && stream !== 'All') {
       students = students.filter((s) => s.stream.toLowerCase() === (stream as string).toLowerCase());
